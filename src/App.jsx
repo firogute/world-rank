@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import axios from "./api/axiosInstance";
 
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
+
   const fetchData = async () => {
     try {
       const response = await fetch(
