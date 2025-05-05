@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+.header {
+  background-image: url("./assets/hero-image.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 300px;
+}
