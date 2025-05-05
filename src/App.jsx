@@ -8,12 +8,8 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        "https://restcountries.com/v3.1/all?sort=population"
-      );
-
-      const data = await response.json();
-      console.log(data[0]);
+      const response = await axios.get("all?sort=population");
+      console.log(response.data);
     } catch (e) {
       console.error(e.message);
     }
