@@ -12,6 +12,7 @@ function App() {
     try {
       const response = await axios.get("all?sort=population");
       const data = response.data;
+      setCountries(response.data);
     } catch (e) {
       console.error(e.message);
     }
@@ -53,7 +54,7 @@ function App() {
                   </label>
                   <select
                     name="sortby"
-                    id=""
+                    id="sortby"
                     className="cursor-pointer px-3 py-2 pr-8 border-2 border-[#282B30] rounded-xl appearance-none bg-no-repeat bg-[right_0.5rem_center] text-sm"
                   >
                     <option value="area" className="bg-[#1B1D1F]">
@@ -66,6 +67,50 @@ function App() {
                       Population
                     </option>
                   </select>
+                  <div className="mt-9 flex flex-col gap-3">
+                    <p className="text-xs">Region</p>
+                    <div className="flex flex-wrap gap-2.5 text-sm">
+                      <button className="rounded-xl px-3 py-1.5">
+                        Americas
+                      </button>
+                      <button className="rounded-xl px-3 py-1.5">
+                        Antarctic
+                      </button>
+                      <button className="rounded-xl px-3 py-1.5 bg-[#282B30]">
+                        Africa
+                      </button>
+                      <button className="rounded-xl px-3 py-1.5">Asia</button>
+                      <button className="rounded-xl px-3 py-1.5">Europe</button>
+                      <button className="rounded-xl px-3 py-1.5 bg-[#282B30]">
+                        Oceania
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-9 flex flex-col gap-3">
+                    <p className="text-xs">Status</p>
+                    <div className="grid grid-cols-[auto_1fr] gap-2.5 items-center text-sm">
+                      <input
+                        type="checkbox"
+                        name="member"
+                        id="member"
+                        className="cursor-pointer size-6 bg-[#1B1D1F] rounded-md checked:bg-[#4E80EE] border-2 border-[#D2D5DA] checked:border-[#4E80EE] appearance-none"
+                      />
+                      <label htmlFor="member" className="cursor-pointer">
+                        Member of the United Nations
+                      </label>
+                    </div>
+                    <div className="grid grid-cols-[auto_1fr] gap-2.5 items-center text-sm">
+                      <input
+                        type="checkbox"
+                        name="independent"
+                        id="independent"
+                        className="cursor-pointer size-6 bg-[#1B1D1F] rounded-md checked:bg-[#4E80EE] border-2 border-[#D2D5DA] checked:border-[#4E80EE] appearance-none"
+                      />
+                      <label htmlFor="independent" className="cursor-pointer">
+                        Independent
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

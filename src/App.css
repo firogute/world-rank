@@ -11,3 +11,13 @@
 select {
   background-image: url("./assets/Expand_down.svg");
 }
+
+input[type="checkbox"]:checked {
+  background-image: url("./assets/Done_round.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+button {
+  cursor: pointer;
+}
