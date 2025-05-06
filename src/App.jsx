@@ -9,19 +9,30 @@ function App() {
   const [countries, setCountries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredCountries, setFilteredCountries] = useState([]);
+  const [selectedSort, setSelectedSort] = useState("population");
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("all?sort=population");
+      const response = await axios.get("all");
       const data = response.data;
-      console.log(data);
-      setCountries(data);
+      const sorted = data.sort((a, b) => b[selectedSort] - a[selectedSort]);
+      setCountries(sorted);
     } catch (e) {
       console.error(e.message);
     }
   };
+
+  const sortCountries = (selectedSort) => {
+    const copy = [...countries];
+    const sorted = copy.sort((a, b) => {
+      if (selectedSort === "name") {
+        return a.name.common.localeCompare(b.name.common);
+      }
+      return b[selectedSort] - a[selectedSort];
+    });
+    setCountries(sorted);
+  };
   useEffect(() => {
-    console.log("Fetching");
     fetchData();
   }, []);
 
@@ -38,7 +49,7 @@ function App() {
 
   useEffect(() => {
     filterCountries();
-  }, [filterCountries]);
+  }, [filterCountries, countries]);
 
   const handleNext = () => {
     if (currentPage * 10 < countries.length) {
@@ -47,10 +58,16 @@ function App() {
   };
 
   const handlePrev = () => {
-    if (currentPage > 0) {
+    if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     }
   };
+
+  const handleSort = (e) => setSelectedSort(e.target.value);
+
+  useEffect(() => {
+    sortCountries(selectedSort);
+  }, [selectedSort]);
 
   return (
     <>
@@ -86,6 +103,8 @@ function App() {
                     name="sortby"
                     id="sortby"
                     className="cursor-pointer px-3 py-2 pr-8 border-2 border-[#282B30] rounded-xl appearance-none bg-no-repeat bg-[right_0.5rem_center] text-sm"
+                    onChange={handleSort}
+                    value={selectedSort}
                   >
                     <option value="area" className="bg-[#1B1D1F]">
                       Area
@@ -193,8 +212,8 @@ function App() {
                   <div className="w-full flex justify-between">
                     <p className="text-sm self-end">
                       Showing {(currentPage - 1) * 10 + 1} to{" "}
-                      {(currentPage - 1) * 10 + 10} of {countries.length}{" "}
-                      countries
+                      {Math.min(currentPage * 10, countries.length)} of{" "}
+                      {countries.length} countries
                     </p>
                     <div className="flex gap-3">
                       {currentPage > 1 ? (
@@ -207,12 +226,14 @@ function App() {
                       ) : (
                         ""
                       )}
-                      <button
-                        className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
-                        onClick={handleNext}
-                      >
-                        Next Page {currentPage} »
-                      </button>
+                      {currentPage * 10 < countries.length && (
+                        <button
+                          className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
+                          onClick={handleNext}
+                        >
+                          Next Page {currentPage} »
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -220,18 +241,18 @@ function App() {
             </div>
           </div>
         </main>
-        <footer class="text-center text-sm mt-12 mx-auto py-8 text-[#97A3B6]">
+        <footer className="text-center text-sm mt-12 mx-auto py-8 text-[#97A3B6]">
           Coded by{" "}
           <a
             href="#"
-            class="no-underline text-gray-200 font-semibold hover:underline"
+            className="no-underline text-gray-200 font-semibold hover:underline"
           >
             Firomsa Guteta
           </a>{" "}
           | Challenge by
           <a
             href="https://www.devchallenges.io?ref=challenge"
-            class="text-gray-200 font-semibold hover:underline"
+            className="text-gray-200 font-semibold hover:underline"
             target="_blank"
             rel="noreferrer"
           >
@@ -241,7 +262,7 @@ function App() {
           . |{" "}
           <a
             href="https://github.com/firogute/world-rank"
-            class="text-gray-200 font-semibold hover:underline"
+            className="text-gray-200 font-semibold hover:underline"
           >
             Source code
           </a>
