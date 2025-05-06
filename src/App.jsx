@@ -220,6 +220,32 @@ function App() {
             </div>
           </div>
         </main>
+        <footer class="text-center text-sm mt-12 mx-auto py-8 text-[#97A3B6]">
+          Coded by{" "}
+          <a
+            href="#"
+            class="no-underline text-gray-200 font-semibold hover:underline"
+          >
+            Firomsa Guteta
+          </a>{" "}
+          | Challenge by
+          <a
+            href="https://www.devchallenges.io?ref=challenge"
+            class="text-gray-200 font-semibold hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {" "}
+            devChallenges.io
+          </a>
+          . |{" "}
+          <a
+            href="https://github.com/firogute/world-rank"
+            class="text-gray-200 font-semibold hover:underline"
+          >
+            Source code
+          </a>
+        </footer>
       </div>
     </>
   );
