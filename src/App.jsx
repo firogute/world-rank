@@ -9,8 +9,11 @@ function App() {
   const [countries, setCountries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredCountries, setFilteredCountries] = useState([]);
+  const [filteredCount, setFilteredCount] = useState(0);
   const [selectedSort, setSelectedSort] = useState("population");
   const [selectedRegions, setSelectedRegions] = useState([]);
+  const [onlyIndependent, setOnlyIndependent] = useState(true);
+  const [onlyUNMembers, setOnlyUNMembers] = useState(true);
 
   // FETCHING COUNTRIES FROM API
   const fetchData = async () => {
@@ -67,10 +70,6 @@ function App() {
 
   const handleSort = (e) => setSelectedSort(e.target.value);
 
-  useEffect(() => {
-    sortCountries(selectedSort);
-  }, [selectedSort]);
-
   const toggleRegion = (region) => {
     setSelectedRegions((prevRegions) => {
       if (prevRegions.includes(region)) {
@@ -83,15 +82,33 @@ function App() {
   const isRegionSelected = (region) => selectedRegions.includes(region);
 
   const applyFilters = useCallback(() => {
-    const regionFiltered = filterByRegion(countries, selectedRegions);
+    let regionFiltered = filterByRegion(countries, selectedRegions);
+    regionFiltered = regionFiltered.filter(
+      (c) => c.independent === onlyIndependent
+    );
+    regionFiltered = regionFiltered.filter((c) => c.unMember === onlyUNMembers);
+
+    setFilteredCount(regionFiltered.length);
+
     const sorted = sortCountries(regionFiltered, selectedSort);
     const paginated = paginate(sorted, currentPage);
+
     setFilteredCountries(paginated);
-  }, [countries, selectedRegions, selectedSort, currentPage]);
+  }, [
+    countries,
+    selectedRegions,
+    selectedSort,
+    currentPage,
+    onlyIndependent,
+    onlyUNMembers,
+  ]);
 
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedRegions, selectedSort, onlyIndependent, onlyUNMembers]);
 
   return (
     <>
@@ -104,7 +121,7 @@ function App() {
           <div className="z-10 flex justify-center">
             <div className="text-[#D2D5DA] bg-[#1B1D1F] border border-[#282B30] -mt-[60px] mx-3 rounded-xl py-6 px-3 md:px-7 md:mx-7 basis-7xl">
               <div className="grid grid-cols-1 md:grid-cols-[1fr_384px]  gap-6">
-                <span>Found {countries.length} Countries</span>
+                <span>Found {filteredCount} Countries</span>
                 <div className="relative">
                   <input
                     type="text"
@@ -212,6 +229,8 @@ function App() {
                         type="checkbox"
                         name="member"
                         id="member"
+                        checked={onlyUNMembers}
+                        onChange={(e) => setOnlyUNMembers(e.target.checked)}
                         className="cursor-pointer size-6 bg-[#1B1D1F] rounded-md checked:bg-[#4E80EE] border-2 border-[#D2D5DA] checked:border-[#4E80EE] appearance-none"
                       />
                       <label htmlFor="member" className="cursor-pointer">
@@ -223,6 +242,8 @@ function App() {
                         type="checkbox"
                         name="independent"
                         id="independent"
+                        checked={onlyIndependent}
+                        onChange={(e) => setOnlyIndependent(e.target.checked)}
                         className="cursor-pointer size-6 bg-[#1B1D1F] rounded-md checked:bg-[#4E80EE] border-2 border-[#D2D5DA] checked:border-[#4E80EE] appearance-none"
                       />
                       <label htmlFor="independent" className="cursor-pointer">
@@ -280,31 +301,38 @@ function App() {
                     </tbody>
                   </table>
                   <div className="w-full flex justify-between">
-                    <p className="text-sm self-end">
-                      Showing {(currentPage - 1) * 10 + 1} to{" "}
-                      {Math.min(currentPage * 10, countries.length)} of{" "}
-                      {countries.length} countries
-                    </p>
-                    <div className="flex gap-3">
-                      {currentPage > 1 ? (
-                        <button
-                          className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
-                          onClick={handlePrev}
-                        >
-                          « Prev Page {currentPage - 1}
-                        </button>
-                      ) : (
-                        ""
-                      )}
-                      {currentPage * 10 < countries.length && (
-                        <button
-                          className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
-                          onClick={handleNext}
-                        >
-                          Next Page {currentPage + 1} »
-                        </button>
-                      )}
-                    </div>
+                    {filteredCountries && filteredCountries.length > 0 && (
+                      <>
+                        <p className="text-sm self-end">
+                          Showing {(currentPage - 1) * 10 + 1} to{" "}
+                          {Math.min(currentPage * 10, filteredCount)} of{" "}
+                          {filteredCount} countries
+                        </p>
+                        <div className="flex gap-3">
+                          {currentPage > 1 ? (
+                            <button
+                              className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
+                              onClick={handlePrev}
+                            >
+                              « Prev Page {currentPage - 1}
+                            </button>
+                          ) : (
+                            ""
+                          )}
+                          {currentPage * 10 < filteredCount &&
+                          filteredCountries.length >= 10 ? (
+                            <button
+                              className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
+                              onClick={handleNext}
+                            >
+                              Next Page {currentPage + 1} »
+                            </button>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
