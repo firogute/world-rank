@@ -10,7 +10,9 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [selectedSort, setSelectedSort] = useState("population");
+  const [selectedRegions, setSelectedRegions] = useState([]);
 
+  // FETCHING COUNTRIES FROM API
   const fetchData = async () => {
     try {
       const response = await axios.get("all");
@@ -22,34 +24,34 @@ function App() {
     }
   };
 
-  const sortCountries = (selectedSort) => {
-    const copy = [...countries];
-    const sorted = copy.sort((a, b) => {
-      if (selectedSort === "name") {
-        return a.name.common.localeCompare(b.name.common);
-      }
-      return b[selectedSort] - a[selectedSort];
-    });
-    setCountries(sorted);
-  };
   useEffect(() => {
     fetchData();
   }, []);
 
-  const filterCountries = useCallback(() => {
-    const filteredCountry = [];
-    const startIndex = (currentPage - 1) * 10;
-    const endIndex = startIndex + 10;
+  // FILTER BY REGION
 
-    for (let i = startIndex; i < endIndex && i < countries.length; i++) {
-      filteredCountry.push(countries[i]);
+  const filterByRegion = (countries, selectedRegions) => {
+    if (selectedRegions.length === 0) return countries;
+    return countries.filter((country) =>
+      selectedRegions.includes(country.region)
+    );
+  };
+
+  // SORT COUNTRIES
+  const sortCountries = (countries, selectedSort) => {
+    const sorted = [...countries];
+    if (selectedSort === "name") {
+      sorted.sort((a, b) => a.name.common.localeCompare(b.name.common));
+    } else {
+      sorted.sort((a, b) => b[selectedSort] - a[selectedSort]);
     }
-    setFilteredCountries(filteredCountry);
-  }, [currentPage, countries]);
+    return sorted;
+  };
 
-  useEffect(() => {
-    filterCountries();
-  }, [filterCountries, countries]);
+  const paginate = (countries, currentPage, itemsPerPage = 10) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return countries.slice(startIndex, startIndex + itemsPerPage);
+  };
 
   const handleNext = () => {
     if (currentPage * 10 < countries.length) {
@@ -68,6 +70,28 @@ function App() {
   useEffect(() => {
     sortCountries(selectedSort);
   }, [selectedSort]);
+
+  const toggleRegion = (region) => {
+    setSelectedRegions((prevRegions) => {
+      if (prevRegions.includes(region)) {
+        return prevRegions.filter((r) => r != region);
+      }
+      return [...prevRegions, region];
+    });
+  };
+
+  const isRegionSelected = (region) => selectedRegions.includes(region);
+
+  const applyFilters = useCallback(() => {
+    const regionFiltered = filterByRegion(countries, selectedRegions);
+    const sorted = sortCountries(regionFiltered, selectedSort);
+    const paginated = paginate(sorted, currentPage);
+    setFilteredCountries(paginated);
+  }, [countries, selectedRegions, selectedSort, currentPage]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   return (
     <>
@@ -119,18 +143,64 @@ function App() {
                   <div className="mt-9 flex flex-col gap-3">
                     <p className="text-xs">Region</p>
                     <div className="flex flex-wrap gap-2.5 text-sm">
-                      <button className="rounded-xl px-3 py-1.5">
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Americas")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Americas")}
+                      >
                         Americas
                       </button>
-                      <button className="rounded-xl px-3 py-1.5">
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Antarctic")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Antarctic")}
+                      >
                         Antarctic
                       </button>
-                      <button className="rounded-xl px-3 py-1.5 bg-[#282B30]">
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Africa")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Africa")}
+                      >
                         Africa
                       </button>
-                      <button className="rounded-xl px-3 py-1.5">Asia</button>
-                      <button className="rounded-xl px-3 py-1.5">Europe</button>
-                      <button className="rounded-xl px-3 py-1.5 bg-[#282B30]">
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Asia")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Asia")}
+                      >
+                        Asia
+                      </button>
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Europe")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Europe")}
+                      >
+                        Europe
+                      </button>
+                      <button
+                        className={`rounded-xl px-3 py-1.5 ${
+                          isRegionSelected("Oceania")
+                            ? "bg-[#282B30]"
+                            : "bg-transparent"
+                        }`}
+                        onClick={() => toggleRegion("Oceania")}
+                      >
                         Oceania
                       </button>
                     </div>
@@ -231,7 +301,7 @@ function App() {
                           className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
                           onClick={handleNext}
                         >
-                          Next Page {currentPage} »
+                          Next Page {currentPage + 1} »
                         </button>
                       )}
                     </div>
