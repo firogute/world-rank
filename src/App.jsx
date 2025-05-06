@@ -14,6 +14,7 @@ function App() {
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [onlyIndependent, setOnlyIndependent] = useState(true);
   const [onlyUNMembers, setOnlyUNMembers] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // FETCHING COUNTRIES FROM API
   const fetchData = async () => {
@@ -88,6 +89,12 @@ function App() {
     );
     regionFiltered = regionFiltered.filter((c) => c.unMember === onlyUNMembers);
 
+    regionFiltered = regionFiltered.filter((c) =>
+      `${c.name.common} ${c.region} ${c.subregion || ""}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+
     setFilteredCount(regionFiltered.length);
 
     const sorted = sortCountries(regionFiltered, selectedSort);
@@ -101,6 +108,7 @@ function App() {
     currentPage,
     onlyIndependent,
     onlyUNMembers,
+    searchTerm,
   ]);
 
   useEffect(() => {
@@ -125,6 +133,8 @@ function App() {
                 <div className="relative">
                   <input
                     type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="cursor-text placeholder:text-[#D2D5DA] rounded-xl bg-[#282B30] pl-11 px-3 py-2.5 w-full"
                     placeholder="Search by Name, Region, Subregion"
                   />
