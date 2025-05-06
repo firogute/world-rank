@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "../api/axiosInstance";
 
 const CountryDetail = ({ country, onBack }) => {
-  console.log(country);
   const [neighbors, setNeighbors] = useState([]);
   useEffect(() => {
     const fetchNeighbors = async () => {
@@ -18,8 +17,6 @@ const CountryDetail = ({ country, onBack }) => {
           flag: c.flags.png,
           alt: c.flags.alt,
         }));
-
-        console.log("Fetched neighbor data:", neighborsData);
         setNeighbors(neighborsData);
       } catch (error) {
         console.error("Error fetching neighbors:", error);
@@ -39,7 +36,7 @@ const CountryDetail = ({ country, onBack }) => {
       </div>
       <div className="text-center">
         <h1 className="text-[2rem] font-medium">{country.name.common}</h1>
-        <p>{country.altSpellings[2]}</p>
+        <p>{country.name.official}</p>
       </div>
       <div className="flex gap-10 justify-center flex-wrap px-5">
         <div className="grow bg-[#282B30] px-5 py-2 rounded-xl flex items-center justify-center">
