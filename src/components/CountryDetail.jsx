@@ -81,9 +81,9 @@ const CountryDetail = ({ country, onBack }) => {
           <div className="border-t border-[#282B30] px-5 py-6 flex flex-col gap-6">
             <p className="font-bold">Neighbouring Countries</p>
             <div className="flex gap-4 flex-wrap">
-              {neighbors.map((neighbor) => {
+              {neighbors.map((neighbor, i) => {
                 return (
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5" key={i}>
                     <figure>
                       <img
                         alt={neighbor.alt}
