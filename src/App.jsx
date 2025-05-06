@@ -46,6 +46,12 @@ function App() {
     }
   };
 
+  const handlePrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
   return (
     <>
       <div className="bg-[#1B1D1F]">
@@ -136,7 +142,7 @@ function App() {
                     </div>
                   </div>
                 </div>
-                <div className="w-full grow">
+                <div className="w-full grow flex flex-col gap-3 overflow-x-scroll lg:overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="text-left text-xs">
@@ -190,12 +196,24 @@ function App() {
                       {(currentPage - 1) * 10 + 10} of {countries.length}{" "}
                       countries
                     </p>
-                    <button
-                      className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
-                      onClick={handleNext}
-                    >
-                      Next Page {currentPage} »
-                    </button>
+                    <div className="flex gap-3">
+                      {currentPage > 1 ? (
+                        <button
+                          className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
+                          onClick={handlePrev}
+                        >
+                          « Prev Page {currentPage - 1}
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                      <button
+                        className="px-3 py-1.5 border-2 border-[#282B30] rounded-xl hover:bg-[#282B30] cursor-pointer transition-all"
+                        onClick={handleNext}
+                      >
+                        Next Page {currentPage} »
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
