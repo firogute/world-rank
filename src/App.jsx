@@ -29,7 +29,10 @@ function App() {
   // FETCHING COUNTRIES FROM API
   const fetchData = async () => {
     try {
-      const response = await axios.get("all");
+      const response = await axios.get(
+        "all?fields=name,flags,population,area,region,subregion,independent,unMember"
+      );
+
       const data = response.data;
       const sorted = data.sort((a, b) => b[selectedSort] - a[selectedSort]);
       setCountries(sorted);
@@ -188,61 +191,55 @@ function App() {
                         <p className="text-xs">Region</p>
                         <div className="flex flex-wrap gap-2.5 text-sm">
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Americas")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Americas")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Americas")}
                           >
                             Americas
                           </button>
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Antarctic")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Antarctic")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Antarctic")}
                           >
                             Antarctic
                           </button>
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Africa")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Africa")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Africa")}
                           >
                             Africa
                           </button>
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Asia")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Asia")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Asia")}
                           >
                             Asia
                           </button>
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Europe")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Europe")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Europe")}
                           >
                             Europe
                           </button>
                           <button
-                            className={`rounded-xl px-3 py-1.5 ${
-                              isRegionSelected("Oceania")
-                                ? "bg-[#282B30]"
-                                : "bg-transparent"
-                            }`}
+                            className={`rounded-xl px-3 py-1.5 ${isRegionSelected("Oceania")
+                              ? "bg-[#282B30]"
+                              : "bg-transparent"
+                              }`}
                             onClick={() => toggleRegion("Oceania")}
                           >
                             Oceania

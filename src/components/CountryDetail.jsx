@@ -1,106 +1,119 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "../api/axiosInstance";
 
 const CountryDetail = ({ country, onBack }) => {
+  const [details, setDetails] = useState(null);
   const [neighbors, setNeighbors] = useState([]);
-  useEffect(() => {
-    const fetchNeighbors = async () => {
-      if (!country.borders || country.borders.length === 0) return;
 
+  // fetch extra details: languages, currencies, continents, borders
+  useEffect(() => {
+    const fetchDetails = async () => {
       try {
-        const responses = await Promise.all(
-          country.borders.map((code) => axios.get(`alpha/${code}`))
+        const res = await axios.get(
+          `alpha/${country.cca3}?fields=languages,currencies,continents,borders`
         );
-        const result = responses.map((res) => res.data[0]);
-        const neighborsData = result.map((c) => ({
-          name: c.name.common,
-          flag: c.flags.png,
-          alt: c.flags.alt,
-        }));
-        setNeighbors(neighborsData);
-      } catch (error) {
-        console.error("Error fetching neighbors:", error);
+        setDetails(res.data[0]);
+      } catch (err) {
+        console.error("Error fetching country details:", err);
       }
     };
+    fetchDetails();
+  }, [country]);
 
+  // fetch neighboring countries
+  useEffect(() => {
+    if (!details?.borders?.length) return;
+
+    const fetchNeighbors = async () => {
+      try {
+        const responses = await Promise.all(
+          details.borders.map((code) =>
+            axios.get(`alpha/${code}?fields=name,flags`)
+          )
+        );
+        const neighborsData = responses.map((res) => ({
+          name: res.data[0].name.common,
+          flag: res.data[0].flags.png,
+          alt: res.data[0].flags.alt,
+        }));
+        setNeighbors(neighborsData);
+      } catch (err) {
+        console.error("Error fetching neighbors:", err);
+      }
+    };
     fetchNeighbors();
-  }, [country.borders]);
+  }, [details]);
+
+  if (!details) return <p className="text-white text-center py-10">Loading...</p>;
+
   return (
-    <div className="bg-[#1B1D1F] border border-[#282B30] sm:rounded-xl mx-auto -mt-[45px] sm:-mt-[60px] max-w-[720px] w-full text-[#D2D5DA] z-10 flex flex-col gap-10">
-      <div className="max-w-[260px] min-h-[196px] mx-auto -mt-[37.5px] sm:-mt-[50px] grid">
+    <div className="bg-[#1B1D1F] border border-[#282B30] sm:rounded-xl mx-auto max-w-[720px] w-full text-[#D2D5DA] flex flex-col gap-6 p-5">
+      <div className="max-w-[260px] mx-auto">
         <img
-          alt={country.flags.alt}
-          className="w-full h-full rounded-xl"
           src={country.flags.png}
+          alt={country.flags.alt || country.name.common}
+          className="rounded-xl w-full h-full"
         />
       </div>
-      <div className="text-center">
-        <h1 className="text-[2rem] font-medium">{country.name.common}</h1>
-        <p>{country.name.official}</p>
-      </div>
-      <div className="flex gap-10 justify-center flex-wrap px-5">
-        <div className="grow bg-[#282B30] px-5 py-2 rounded-xl flex items-center justify-center">
-          <p className="pr-5 border-r py-2 border-[#1B1D1F]">Population</p>
-          <p className="bg-[#282B30] p-3 pl-5 py-2 text-lg font-medium">
-            {country.population.toLocaleString()}
-          </p>
+      <h1 className="text-2xl text-center">{country.name.common}</h1>
+      <p className="text-center">{country.name.official}</p>
+
+      <div className="flex gap-6 justify-center flex-wrap">
+        <div className="bg-[#282B30] px-5 py-2 rounded-xl flex items-center justify-center gap-2">
+          <p>Population:</p>
+          <p>{country.population.toLocaleString()}</p>
         </div>
-        <div className="grow bg-[#282B30] px-5 py-2 rounded-xl flex items-center justify-center">
-          <p className="pr-5 border-r py-2 border-[#1B1D1F]">Area</p>
-          <p className="bg-[#282B30] p-3 pl-5 py-2 text-lg font-medium">
-            {country.area.toLocaleString()} km²
-          </p>
+        <div className="bg-[#282B30] px-5 py-2 rounded-xl flex items-center justify-center gap-2">
+          <p>Area:</p>
+          <p>{country.area.toLocaleString()} km²</p>
         </div>
       </div>
-      <div className="mt-4">
-        <div className="text-sm">
-          <div className="border-t border-[#282B30] px-5 py-6 flex justify-between">
-            <p>Region</p>
-            <p>{country.region}</p>
-          </div>
-          <div className="border-t border-[#282B30] px-5 py-6 flex justify-between">
-            <p>Subregion</p>
-            <p>{country.subregion}</p>
-          </div>
-          <div className="border-t border-[#282B30] px-5 py-6 flex justify-between">
-            <p>Languages</p>
-            <p>{Object.values(country.languages).join(", ")}</p>
-          </div>
-          <div className="border-t border-[#282B30] px-5 py-6 flex justify-between">
-            <p>Currencies</p>
-            <p>
-              {Object.values(country.currencies)
-                .map((currency) => currency.name)
-                .join(", ")}
-            </p>
-          </div>
-          <div className="border-t border-[#282B30] px-5 py-6 flex justify-between">
-            <p>Continents</p>
-            <p>{country.continents.join(", ")}</p>
-          </div>
-          <div className="border-t border-[#282B30] px-5 py-6 flex flex-col gap-6">
+
+      <div className="mt-4 text-sm">
+        <div className="border-t border-[#282B30] py-4 flex justify-between">
+          <p>Region</p>
+          <p>{country.region}</p>
+        </div>
+        <div className="border-t border-[#282B30] py-4 flex justify-between">
+          <p>Subregion</p>
+          <p>{country.subregion}</p>
+        </div>
+        <div className="border-t border-[#282B30] py-4 flex justify-between">
+          <p>Languages</p>
+          <p>{Object.values(details.languages || {}).join(", ")}</p>
+        </div>
+        <div className="border-t border-[#282B30] py-4 flex justify-between">
+          <p>Currencies</p>
+          <p>
+            {details.currencies
+              ? Object.values(details.currencies)
+                .map((c) => c.name)
+                .join(", ")
+              : "N/A"}
+          </p>
+        </div>
+        <div className="border-t border-[#282B30] py-4 flex justify-between">
+          <p>Continents</p>
+          <p>{details.continents?.join(", ")}</p>
+        </div>
+
+        {neighbors.length > 0 && (
+          <div className="border-t border-[#282B30] py-4">
             <p className="font-bold">Neighbouring Countries</p>
-            <div className="flex gap-4 flex-wrap">
-              {neighbors.map((neighbor, i) => {
-                return (
-                  <div className="flex flex-col gap-1.5" key={i}>
-                    <figure>
-                      <img
-                        alt={neighbor.alt}
-                        className="rounded-md w-20 h-[60px]"
-                        src={neighbor.flag}
-                      />
-                      <figcaption>{neighbor.name}</figcaption>
-                    </figure>
-                  </div>
-                );
-              })}
+            <div className="flex flex-wrap gap-4 mt-2">
+              {neighbors.map((n, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <img src={n.flag} alt={n.alt} className="w-20 h-12 rounded-md" />
+                  <p>{n.name}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
+
       <button
-        className="mt-6 px-4 py-2 bg-[#282B30] rounded-xl text-sm text-white"
+        className="mt-6 px-4 py-2 bg-[#282B30] rounded-xl text-white"
         onClick={onBack}
       >
         Back to Country List
